@@ -2,14 +2,27 @@ import { writable, derived, get } from 'svelte/store';
 
 export function asyncable(getter, setter = () => {}, stores = []) {
 	const derived$ = derived(stores, (values) => values);
+	let store$ = null;
+	let stop = () => {};
 
-	const store$ = writable(null, (set) => {
-		return derived$.subscribe(async (values = []) => {
-			let value = getter(...values);
-			if (value === undefined) return;
-			value = Promise.resolve(value);
-			set(value);
+	store$ = writable(null, (set) => {
+		const derivedStop = derived$.subscribe(async (values = []) => {
+			// Set promise on start to avoid yielding null
+			// It will never be resolved
+			set(new Promise(async () => {
+				try {
+					stop = await getter((value) => {
+						store$.set(Promise.resolve(value));
+					}, ...values) || (() => {});
+				} catch (err) {
+					reject(err);
+				}
+			}));
 		});
+		return () => {
+			stop();
+			derivedStop();
+		};
 	});
 
 	async function set(newValue, oldValue) {
