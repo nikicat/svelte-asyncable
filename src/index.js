@@ -10,13 +10,16 @@ export function asyncable(getter, setter = () => {}, stores = []) {
 			// Set promise on start to avoid yielding null
 			// It will never be resolved
 			let reject_;
-			set(new Promise((resolve, reject) => {
-				reject_ = reject;
-			}));
+			set(
+				new Promise((resolve, reject) => {
+					reject_ = reject;
+				})
+			);
 			try {
-				stop = await getter((value) => {
-					store$.set(Promise.resolve(value));
-				}, ...values) || (() => {});
+				stop =
+					(await getter((value) => {
+						store$.set(Promise.resolve(value));
+					}, ...values)) || (() => {});
 			} catch (err) {
 				reject_(err);
 			}

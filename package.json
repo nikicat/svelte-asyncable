@@ -54,17 +54,17 @@
         },
         {
             "name": "IIFE bundle",
-            "limit": "3.5 KB",
+            "limit": "7 KB",
             "path": "./dist/asyncable.js"
         },
         {
             "name": "ESM bundle",
-            "limit": "1.6 KB",
+            "limit": "2 KB",
             "path": "./dist/asyncable.mjs"
         },
         {
             "name": "IIFE bundle (minified)",
-            "limit": "2 KB",
+            "limit": "4.5 KB",
             "path": "./dist/asyncable.min.js"
         },
         {
