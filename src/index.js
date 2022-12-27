@@ -9,15 +9,17 @@ export function asyncable(getter, setter = () => {}, stores = []) {
 		const derivedStop = derived$.subscribe(async (values = []) => {
 			// Set promise on start to avoid yielding null
 			// It will never be resolved
-			set(new Promise(async () => {
-				try {
-					stop = await getter((value) => {
-						store$.set(Promise.resolve(value));
-					}, ...values) || (() => {});
-				} catch (err) {
-					reject(err);
-				}
+			let reject_;
+			set(new Promise((resolve, reject) => {
+				reject_ = reject;
 			}));
+			try {
+				stop = await getter((value) => {
+					store$.set(Promise.resolve(value));
+				}, ...values) || (() => {});
+			} catch (err) {
+				reject_(err);
+			}
 		});
 		return () => {
 			stop();
